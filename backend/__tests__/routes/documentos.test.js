@@ -255,6 +255,16 @@ describe('GET /api/documentos/:cpf', () => {
         expect(res.status).toBe(200);
         expect(res.body.documentos).toHaveLength(2);
       });
+
+      it('deve retornar 400 quando o ano informado não tem formato válido de 4 dígitos', async () => {
+        // Act
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=abc`);
+
+        // Assert
+        expect(res.status).toBe(400);
+        expect(res.body.success).toBe(false);
+        expect(res.body.message).toBe('Parâmetro ano inválido. Use um ano com 4 dígitos');
+      });
     });
 
     it('cada documento deve conter os campos obrigatórios', async () => {

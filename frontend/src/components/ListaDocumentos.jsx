@@ -22,7 +22,7 @@ function ListaDocumentos({ colaborador, documentos, tipoDocumento, onVoltar, onV
 
   const documentosFiltrados = useMemo(() => {
     if (tipoDocumento !== 'IR' || !anoSelecionado) return documentos;
-    return documentos.filter((d) => d.ano === anoSelecionado);
+    return documentos.filter((d) => String(d.ano) === anoSelecionado);
   }, [documentos, tipoDocumento, anoSelecionado]);
 
   return (

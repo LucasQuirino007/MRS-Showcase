@@ -76,6 +76,13 @@ router.get('/documentos/:cpf', (req, res) => {
     });
   }
 
+  if (ano !== undefined && !/^\d{4}$/.test(ano)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Parâmetro ano inválido. Use um ano com 4 dígitos'
+    });
+  }
+
   const colaborador = colaboradores.find((c) => c.cpf === cpf);
   if (!colaborador) {
     return res.status(404).json({
