@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 
 const titulos = {
   IR: 'Informes de Rendimentos',
@@ -13,6 +13,18 @@ function formatarExpiracao(isoString) {
 }
 
 function ListaDocumentos({ colaborador, documentos, tipoDocumento, onVoltar, onVoltarHome }) {
+  const [anoSelecionado, setAnoSelecionado] = useState('');
+
+  const anosDisponiveis = useMemo(() => {
+    if (tipoDocumento !== 'IR') return [];
+    return [...new Set(documentos.map((d) => d.ano))].sort((a, b) => b - a);
+  }, [documentos, tipoDocumento]);
+
+  const documentosFiltrados = useMemo(() => {
+    if (tipoDocumento !== 'IR' || !anoSelecionado) return documentos;
+    return documentos.filter((d) => d.ano === anoSelecionado);
+  }, [documentos, tipoDocumento, anoSelecionado]);
+
   return (
     <div className="max-w-2xl mx-auto">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
@@ -50,17 +62,38 @@ function ListaDocumentos({ colaborador, documentos, tipoDocumento, onVoltar, onV
           </div>
         </div>
 
-        {/* Título */}
-        <div className="mb-5">
-          <h2 className="text-xl font-bold text-slate-800">{titulos[tipoDocumento]}</h2>
-          <p className="text-slate-500 text-sm mt-1">
-            {documentos.length} documento(s) disponível(is)
-          </p>
+        {/* Título e filtro de ano */}
+        <div className="mb-5 flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">{titulos[tipoDocumento]}</h2>
+            <p className="text-slate-500 text-sm mt-1">
+              {documentosFiltrados.length} documento(s) disponível(is)
+            </p>
+          </div>
+
+          {tipoDocumento === 'IR' && anosDisponiveis.length > 1 && (
+            <div className="flex-shrink-0">
+              <label htmlFor="filtro-ano" className="block text-xs font-medium text-slate-600 mb-1">
+                Filtrar por ano
+              </label>
+              <select
+                id="filtro-ano"
+                value={anoSelecionado}
+                onChange={(e) => setAnoSelecionado(e.target.value)}
+                className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              >
+                <option value="">Todos</option>
+                {anosDisponiveis.map((ano) => (
+                  <option key={ano} value={ano}>{ano}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Lista de documentos */}
         <div className="space-y-3">
-          {documentos.map((doc) => (
+          {documentosFiltrados.map((doc) => (
             <div
               key={doc.id}
               className="flex items-center justify-between border border-slate-200 rounded-xl p-4 hover:bg-slate-50 transition-colors"

@@ -191,6 +191,72 @@ describe('GET /api/documentos/:cpf', () => {
       expect(res.body.message).toBe('Documento não localizado');
     });
 
+    // ── Filtro por ano ───────────────────────────────────────────────────────
+
+    describe('filtro por ano', () => {
+      it('deve retornar apenas o informe de 2024 quando ano=2024 é informado', async () => {
+        // Arrange
+        existsSyncSpy.mockReturnValue(true);
+
+        // Act
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=2024`);
+
+        // Assert
+        expect(res.status).toBe(200);
+        expect(res.body.documentos).toHaveLength(1);
+        expect(res.body.documentos[0].ano).toBe('2024');
+      });
+
+      it('deve retornar apenas o informe de 2025 quando ano=2025 é informado', async () => {
+        // Arrange
+        existsSyncSpy.mockReturnValue(true);
+
+        // Act
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=2025`);
+
+        // Assert
+        expect(res.status).toBe(200);
+        expect(res.body.documentos).toHaveLength(1);
+        expect(res.body.documentos[0].ano).toBe('2025');
+      });
+
+      it('deve retornar 404 quando o ano filtrado não tem arquivo disponível', async () => {
+        // Arrange — nenhum arquivo existe
+        existsSyncSpy.mockReturnValue(false);
+
+        // Act
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=2024`);
+
+        // Assert
+        expect(res.status).toBe(404);
+        expect(res.body.message).toBe('Documento não localizado');
+      });
+
+      it('deve retornar 404 quando o ano filtrado não corresponde a nenhum ano disponível', async () => {
+        // Arrange
+        existsSyncSpy.mockReturnValue(true);
+
+        // Act — ano que não existe no sistema
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=2020`);
+
+        // Assert
+        expect(res.status).toBe(404);
+        expect(res.body.message).toBe('Documento não localizado');
+      });
+
+      it('deve retornar todos os informes quando ano não é informado', async () => {
+        // Arrange
+        existsSyncSpy.mockReturnValue(true);
+
+        // Act
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR`);
+
+        // Assert
+        expect(res.status).toBe(200);
+        expect(res.body.documentos).toHaveLength(2);
+      });
+    });
+
     it('cada documento deve conter os campos obrigatórios', async () => {
       // Arrange
       existsSyncSpy.mockReturnValue(true);
