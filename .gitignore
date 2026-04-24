@@ -1,0 +1,61 @@
+# ─── Dependências ─────────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Build / dist ─────────────────────────────────────────────────────────────
+dist/
+build/
+out/
+
+# ─── Vite (frontend) ──────────────────────────────────────────────────────────
+frontend/.vite/
+frontend/dist/
+
+# ─── Cobertura de testes ──────────────────────────────────────────────────────
+coverage/
+*.lcov
+.nyc_output/
+
+# ─── Variáveis de ambiente ────────────────────────────────────────────────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── Cache ────────────────────────────────────────────────────────────────────
+.cache/
+.eslintcache
+.parcelcache
+
+# ─── Editores e IDEs ──────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── Sistema operacional ──────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ─── Pacotes locais ───────────────────────────────────────────────────────────
+*.tgz
+*.zip
