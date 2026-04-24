@@ -21,7 +21,7 @@ function getDocumentos(cpf, tipo, ano) {
 
   if (tipo === 'IR') {
     const todosAnos = ['2024', '2025'];
-    const anos = ano ? todosAnos.filter((a) => a === ano) : todosAnos;
+    const anos = ano ? [ano] : todosAnos;
     for (const ano of anos) {
       const fileName = `INF_${ano}_${cpf}.pdf`;
       const filePath = path.join(storageBase, 'IR', ano, fileName);
@@ -76,7 +76,7 @@ router.get('/documentos/:cpf', (req, res) => {
     });
   }
 
-  if (ano !== undefined && !/^\d{4}$/.test(ano)) {
+  if (ano && !/^\d{4}$/.test(ano)) {
     return res.status(400).json({
       success: false,
       message: 'Parâmetro ano inválido. Use um ano com 4 dígitos'

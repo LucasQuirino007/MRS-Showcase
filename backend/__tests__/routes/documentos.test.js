@@ -232,11 +232,11 @@ describe('GET /api/documentos/:cpf', () => {
         expect(res.body.message).toBe('Documento não localizado');
       });
 
-      it('deve retornar 404 quando o ano filtrado não corresponde a nenhum ano disponível', async () => {
-        // Arrange
-        existsSyncSpy.mockReturnValue(true);
+      it('deve retornar 404 quando o ano filtrado não tem arquivo no storage', async () => {
+        // Arrange — nenhum arquivo existe para o ano informado
+        existsSyncSpy.mockReturnValue(false);
 
-        // Act — ano que não existe no sistema
+        // Act — ano válido em formato mas sem arquivo no storage
         const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=2020`);
 
         // Assert
