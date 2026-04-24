@@ -15,12 +15,13 @@ function gerarTokenTemporario(filePath) {
   return { token, expiresAt };
 }
 
-function getDocumentos(cpf, tipo) {
+function getDocumentos(cpf, tipo, ano) {
   const storageBase = path.join(__dirname, '..', 'storage');
   const documentos = [];
 
   if (tipo === 'IR') {
-    const anos = ['2024', '2025'];
+    const todosAnos = ['2024', '2025'];
+    const anos = ano ? [ano] : todosAnos;
     for (const ano of anos) {
       const fileName = `INF_${ano}_${cpf}.pdf`;
       const filePath = path.join(storageBase, 'IR', ano, fileName);
@@ -66,12 +67,19 @@ function getDocumentos(cpf, tipo) {
 
 router.get('/documentos/:cpf', (req, res) => {
   const { cpf } = req.params;
-  const { tipo } = req.query;
+  const { tipo, ano } = req.query;
 
   if (!tipo || !['IR', 'BOLETO'].includes(tipo)) {
     return res.status(400).json({
       success: false,
       message: 'Parâmetro tipo inválido. Use IR ou BOLETO'
+    });
+  }
+
+  if (ano && !/^\d{4}$/.test(ano)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Parâmetro ano inválido. Use um ano com 4 dígitos'
     });
   }
 
@@ -83,7 +91,7 @@ router.get('/documentos/:cpf', (req, res) => {
     });
   }
 
-  const documentos = getDocumentos(cpf, tipo);
+  const documentos = getDocumentos(cpf, tipo, ano);
 
   if (documentos.length === 0) {
     return res.status(404).json({

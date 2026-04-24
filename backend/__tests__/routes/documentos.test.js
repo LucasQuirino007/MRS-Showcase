@@ -191,6 +191,82 @@ describe('GET /api/documentos/:cpf', () => {
       expect(res.body.message).toBe('Documento não localizado');
     });
 
+    // ── Filtro por ano ───────────────────────────────────────────────────────
+
+    describe('filtro por ano', () => {
+      it('deve retornar apenas o informe de 2024 quando ano=2024 é informado', async () => {
+        // Arrange
+        existsSyncSpy.mockReturnValue(true);
+
+        // Act
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=2024`);
+
+        // Assert
+        expect(res.status).toBe(200);
+        expect(res.body.documentos).toHaveLength(1);
+        expect(res.body.documentos[0].ano).toBe('2024');
+      });
+
+      it('deve retornar apenas o informe de 2025 quando ano=2025 é informado', async () => {
+        // Arrange
+        existsSyncSpy.mockReturnValue(true);
+
+        // Act
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=2025`);
+
+        // Assert
+        expect(res.status).toBe(200);
+        expect(res.body.documentos).toHaveLength(1);
+        expect(res.body.documentos[0].ano).toBe('2025');
+      });
+
+      it('deve retornar 404 quando o ano filtrado não tem arquivo disponível', async () => {
+        // Arrange — nenhum arquivo existe
+        existsSyncSpy.mockReturnValue(false);
+
+        // Act
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=2024`);
+
+        // Assert
+        expect(res.status).toBe(404);
+        expect(res.body.message).toBe('Documento não localizado');
+      });
+
+      it('deve retornar 404 quando o ano filtrado não tem arquivo no storage', async () => {
+        // Arrange — nenhum arquivo existe para o ano informado
+        existsSyncSpy.mockReturnValue(false);
+
+        // Act — ano válido em formato mas sem arquivo no storage
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=2020`);
+
+        // Assert
+        expect(res.status).toBe(404);
+        expect(res.body.message).toBe('Documento não localizado');
+      });
+
+      it('deve retornar todos os informes quando ano não é informado', async () => {
+        // Arrange
+        existsSyncSpy.mockReturnValue(true);
+
+        // Act
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR`);
+
+        // Assert
+        expect(res.status).toBe(200);
+        expect(res.body.documentos).toHaveLength(2);
+      });
+
+      it('deve retornar 400 quando o ano informado não tem formato válido de 4 dígitos', async () => {
+        // Act
+        const res = await request(app).get(`/api/documentos/${VALID_CPF}?tipo=IR&ano=abc`);
+
+        // Assert
+        expect(res.status).toBe(400);
+        expect(res.body.success).toBe(false);
+        expect(res.body.message).toBe('Parâmetro ano inválido. Use um ano com 4 dígitos');
+      });
+    });
+
     it('cada documento deve conter os campos obrigatórios', async () => {
       // Arrange
       existsSyncSpy.mockReturnValue(true);
